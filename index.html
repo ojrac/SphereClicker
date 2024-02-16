@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sphere Clicker</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div id="Container">
+        <div id="Possessions">
+            <div id="Spheres">
+                <p>Spheres: <span class="count">0</span></p>
+            </div>
+            <div id="HolePunches" style="display: none">
+                <p>
+                    Hole Punches:
+                    <span class="count">0</span>
+                    <button class="buy">
+                        Buy (<span class="cost">100</span> spheres)
+                    </button>
+                    <br>
+                    +<span class="rate">0</span> spheres/sec
+                </p>
+            </div>
+        </div>
+        <div id="Gameplay">
+            <svg widviewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle id="TheSphere" cx="50" cy="50" r="50" />
+            </svg>
+        </div>
+        <div id="Metagame">
+        </div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html> 
