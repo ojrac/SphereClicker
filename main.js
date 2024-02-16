@@ -1,4 +1,4 @@
-import { Resource } from "/modules/resource.js";
+import { Resource } from "./modules/resource.js";
 
 window.addEventListener('load', function() {
     g.init();
