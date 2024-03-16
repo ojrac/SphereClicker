@@ -1,4 +1,5 @@
 import { GeneratorResource, Resource } from "./modules/resource.js";
+import { svgAnimate, svgAnimateNow, svgNode } from "./modules/util.js";
 
 window.addEventListener('load', function() {
     g.init();
@@ -35,9 +36,15 @@ window.g = {
         }
 
         g.cacheElements("TheSphere");
+        g.cacheElements("GridSvg");
+        g.cacheElements("SvgContainer");
+        g.cacheElements("AnimatedMask");
+        g.cacheElements("AnimatedMaskCircle");
         g.e.TheSphere.addEventListener("click", function() {
             g.r.Sphere.value++;
         });
+
+        g.prepareSphereGrid();
 
         g.tick();
     },
@@ -65,6 +72,105 @@ window.g = {
 
         res.value -= amount;
         return true;
+    },
+
+    // Misc
+    prepareSphereGrid: function() {
+        const fromPoints = this.pointsAroundCircle(5, 102, 102, 62);
+        for (var i = 0; i < 5; i++)
+        {
+            const pt = fromPoints[i];
+
+            const sphereNode = svgNode("circle", {
+                r: 29,
+                fill: "#ccc",
+                stroke: "#222",
+                mask: "url(#mask)",
+                cx: pt.x,
+                cy: pt.y,
+            });
+            g.e.SvgContainer.appendChild(sphereNode);
+            g.e["Sphere" + i] = sphereNode;
+
+            // Temporary closure, shrug
+            (function(idx) {
+                sphereNode.addEventListener("click", function() {
+                    g.animateSphereGrid(idx);
+                });
+            })(i);
+        }
+    },
+
+    animateSphereGrid: function(clickedIndex) {
+        var elements = g.e.SvgContainer.querySelectorAll("animate");
+        for (const el of elements) {
+            el.parentNode.removeChild(el);
+        }
+
+        const fromPoints = this.pointsAroundCircle(5, 102, 102, 62);
+        const scaleUpMultiplier = 2.488 * 2;
+
+        const oldCircleCenter = fromPoints[clickedIndex];
+
+        const oldCircleToCenter = {
+            x: 102 - oldCircleCenter.x,
+            y: 102 - oldCircleCenter.y,
+        };
+        const newCircleToCenter = {
+            x: oldCircleToCenter.x * scaleUpMultiplier,
+            y: oldCircleToCenter.y * scaleUpMultiplier,
+        };
+
+        const newCenter = {
+            x: 102 + newCircleToCenter.x,
+            y: 102 + newCircleToCenter.y,
+        };
+
+        const newRadius = 62 * scaleUpMultiplier;
+
+        const toPoints = this.pointsAroundCircle(5, newCenter.x, newCenter.y, newRadius);
+
+        var lastAnimations = null;
+        for (var i = 0; i < 5; i++)
+        {
+            const pt = fromPoints[i];
+            const toPt = toPoints[i];
+
+            const sphereNode = g.e["Sphere" + i];
+            lastAnimations = svgAnimateNow(sphereNode, {
+                    cx: `${pt.x};${toPt.x}`,
+                    cy: `${pt.y};${toPt.y}`,
+                    r: "29;100",
+                    "stroke-width": "1;2",
+                },
+                "0.5s", "indefinite");
+            g.e.SvgContainer.appendChild(sphereNode);
+        }
+
+        const animations = svgAnimate(g.e.AnimatedMaskCircle, {
+            r:"100;0",
+        }, "0.333s", "indefinite");
+        animations[0].beginElementAt(0.5);
+    },
+
+    pointsAroundCircle: function(count, centerX, centerY, radius) {
+        // In SVG, y=0 is at the top
+        let yOffset = centerY - radius;
+        let xOffset = centerX - radius;
+
+        const radiansPerStep = 2 * Math.PI / count;
+
+        var result = [];
+        for (var i = 0; i < count; i++)
+        {
+            const radians = (radiansPerStep * i) + (3 * Math.PI / 2.0);
+            result.push({
+                x: (Math.cos(radians) + 1) * radius + xOffset,
+                y: (Math.sin(radians) + 1) * radius + yOffset,
+            });
+        }
+
+        return result;
     },
 
     // Tools

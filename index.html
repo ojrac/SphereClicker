@@ -39,11 +39,26 @@
                 <circle id="TheSphere" cx="50" cy="50" r="50" />
             </svg>
         </div>
-        <div id="Metagame">
+        <div id="Grid" style="height: 256px">
+            <svg id="GridSvg" height="256" widviewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="102" cy="102" r="100" stroke="black" stroke-width="2" fill="none" />
+                <mask id="mask">
+                    <circle cx="102" cy="102" r="100" fill="white" />
+                </mask>
+
+                <g id="SvgContainer"></g>
+
+                <mask id="AnimatedMask">
+                    <circle id="AnimatedMaskCircle" cx="102" cy="102" r="0" fill="#fff">
+                        <animate begin="indefinite" attributeName="r" values="100;0" dur="0.6s"></animate>
+                    </circle>
+                </mask>
+                <circle cx="102" cy="102" r="100" fill="#ccc" mask="url(#AnimatedMask)" style="pointer-events: none"></circle>
+            </svg>
         </div>
     </div>
 
     <script type="module" src="./main.js"></script>
 </body>
 
-</html> 
+</html>
